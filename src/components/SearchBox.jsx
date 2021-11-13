@@ -6,6 +6,7 @@ import Input from './Input';
 import InputButton from './InputButton';
 
 import { BsSearch } from 'react-icons/bs';
+import { flexCenter } from '../common/styles';
 
 const SearchBox = ({
   value,
@@ -18,20 +19,25 @@ const SearchBox = ({
 }) => {
   return (
     <Wrapper width={width}>
-      <form onSubmit={handleSubmit}>
-        <label>
+      <Form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await handleSubmit(e);
+        }}
+      >
+        <Label>
           <Input
             type='text'
             value={value}
             onChange={handleChange}
-            width={inputWidth}
+            width={inputWidth || '100%'}
             placeholder={placeholder}
           />
-        </label>
+        </Label>
         <InputButton type='submit' width={buttonWidth}>
           <BsSearch />
         </InputButton>
-      </form>
+      </Form>
     </Wrapper>
   );
 };
@@ -51,8 +57,18 @@ SearchBox.propTypes = {
 };
 
 const Wrapper = styled.div`
-  width: ${({ width }) => width};
+  ${flexCenter}
+  width: ${({ width }) => width || '100%'};
   margin-left: 20px;
+`;
+
+const Form = styled.form`
+  ${flexCenter}
+  width: 100%;
+`;
+
+const Label = styled.label`
+  width: 90%;
 `;
 
 export default SearchBox;

@@ -1,34 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { flexCenter } from '../common/styles';
 
 import Logo from './Logo';
 import SearchBox from './SearchBox';
 
-const Nav = () => {
-  const [value, setValue] = useState('');
+import getIssueCount from '../apis/getIssueCount';
+import getIssueList from '../apis/getIssueList';
+import { flexCenter } from '../common/styles';
+import { getUrlInfo } from '../common/util';
 
-  const handleSubmit = (e) => {
+const Nav = () => {
+  const [url, setUrl] = useState('');
+  const [totalCount, setTotalCount] = useState(0);
+  const [issueList, setIssueList] = useState([]);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    console.log('🔥: ', totalCount, issueList, page);
+  }, [totalCount, issueList, page]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('submit!', value);
+    console.log('submit!', url);
 
-    // TODO: await getRepository();
+    const { username, reponame, error } = getUrlInfo(url);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setTotalCount(await getIssueCount(username, reponame));
+    setIssueList(await getIssueList(username, reponame, page));
   };
 
   const handleChange = (e) => {
-    setValue(e.target.value);
+    setUrl(e.target.value);
   };
 
   return (
     <Wrapper>
       <Logo />
       <SearchBox
-        value={value}
+        value={url}
         handleSubmit={handleSubmit}
         handleChange={handleChange}
         width='60%'
-        inputWidth='80%'
         buttonWidth='2rem'
         placeholder='Input your github repository url'
       />
