@@ -22,6 +22,11 @@ const GlobalStyle = createGlobalStyle`
     list-style: none;
   }
 
+  a {
+    text-decoration: none;
+    color: ${theme.color.lightpink}
+  }
+
   * {
     box-sizing: border-box;
     animation: fadeIn 0.7s;

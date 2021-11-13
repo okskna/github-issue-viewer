@@ -3,7 +3,7 @@ import styled from 'styled-components';
 const Input = styled.input`
   font-size: 1rem;
   border-radius: 3px;
-  width: ${({ width }) => width};
+  width: ${({ width }) => width || '100%'};
   height: ${({ height }) => height || '2rem'};
 
   background-color: ${({ theme }) => theme.color.deepblack};
