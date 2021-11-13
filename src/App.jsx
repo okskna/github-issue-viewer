@@ -1,8 +1,8 @@
 import React from 'react';
-// import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Nav from './components/Nav';
+import Board from './components/Board';
 
 import { flexCenter } from './common/styles';
 import GlobalStyle from './common/styles/globalStyle';
@@ -12,7 +12,7 @@ const App = () => {
     <Wrapper>
       <GlobalStyle />
       <Nav />
-      <div>This is board</div>
+      <Board />
     </Wrapper>
   );
 };
