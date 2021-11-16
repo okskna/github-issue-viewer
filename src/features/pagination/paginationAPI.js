@@ -13,7 +13,13 @@ export const getIssueCount = async (username, reponame) => {
     );
 
     if (response.status >= 400) {
-      throw new Error('Server error: ' + response.status);
+      if (response.status === 403) {
+        throw new Error('Server error. Please try again later.');
+      }
+
+      if (response.status === 404 || response.status === 422) {
+        throw new Error('Check your user name and repository name');
+      }
     }
 
     const raw = await response.text();
@@ -39,7 +45,13 @@ export const getIssueList = async (username, reponame, page) => {
     );
 
     if (response.status >= 400) {
-      throw new Error('Server error: ' + response.status);
+      if (response.status === 403) {
+        throw new Error('Server error. Please try again later.');
+      }
+
+      if (response.status === 404 || response.status === 422) {
+        throw new Error('Check your user name and repository name');
+      }
     }
 
     const raw = await response.text();
@@ -68,7 +80,13 @@ export const getLikedIssueList = async (repos, page) => {
     );
 
     if (response.status >= 400) {
-      throw new Error('Server error: ' + response.status);
+      if (response.status === 403) {
+        throw new Error('Server error. Please try again later.');
+      }
+
+      if (response.status === 404 || response.status === 422) {
+        throw new Error('Check your user name and repository name');
+      }
     }
 
     const raw = await response.text();

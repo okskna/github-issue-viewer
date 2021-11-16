@@ -51,7 +51,7 @@ export const getIssueCountAsync = createAsyncThunk(
 
       return response;
     } catch (e) {
-      throw new Error('server error');
+      throw new Error(e.message);
     }
   }
 );
@@ -68,7 +68,7 @@ export const getIssueListAsync = createAsyncThunk(
 
       return response;
     } catch (e) {
-      throw new Error('server error');
+      throw new Error(e.message);
     }
   }
 );
@@ -78,16 +78,19 @@ export const getLikedIssueListAsync = createAsyncThunk(
   async (_, thunkAPI) => {
     const state = thunkAPI.getState();
     const { page, likedList } = state.pagination;
-    const reposQueryString = makeReposQueryString(likedList);
 
-    console.log('reposQueryString:', reposQueryString);
+    if (!likedList.length) {
+      throw new Error('Liked list is empty.');
+    }
+
+    const reposQueryString = makeReposQueryString(likedList);
 
     try {
       const response = await getLikedIssueList(reposQueryString, page);
 
       return response;
     } catch (e) {
-      throw new Error('server error');
+      throw new Error(e.message);
     }
   }
 );
@@ -156,6 +159,12 @@ export const paginationSlice = createSlice({
 
       setLikedListToLocalStorage(state.likedList);
     },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    clearError: (state) => {
+      state.error = '';
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -163,8 +172,8 @@ export const paginationSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getIssueCountAsync.rejected, (state, action) => {
+        state.error = action.error.message;
         state.isLoading = false;
-        state.error = action.error;
       })
       .addCase(getIssueCountAsync.fulfilled, (state, action) => {
         const totalCount = action.payload;
@@ -179,7 +188,7 @@ export const paginationSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getIssueListAsync.rejected, (state, action) => {
-        state.error = action.error;
+        state.error = action.error.message;
         state.isLoading = false;
       })
       .addCase(getIssueListAsync.fulfilled, (state, action) => {
@@ -194,7 +203,7 @@ export const paginationSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getLikedIssueListAsync.rejected, (state, action) => {
-        state.error = action.error;
+        state.error = action.error.message;
         state.isLoading = false;
       })
       .addCase(getLikedIssueListAsync.fulfilled, (state, action) => {
@@ -217,6 +226,8 @@ export const {
   setIsHome,
   addLikedLink,
   deleteLikedLink,
+  setError,
+  clearError,
 } = paginationSlice.actions;
 
 export const selectUrlInfo = (state) => state.pagination.urlInfo;
@@ -227,5 +238,6 @@ export const selectMaxPage = (state) => state.pagination.maxPage;
 export const selectIsLoading = (state) => state.pagination.isLoading;
 export const selectIsHome = (state) => state.pagination.isHome;
 export const selectLikedList = (state) => state.pagination.likedList;
+export const selectError = (state) => state.pagination.error;
 
 export default paginationSlice.reducer;

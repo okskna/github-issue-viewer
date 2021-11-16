@@ -10,6 +10,7 @@ import { batch, useDispatch } from 'react-redux';
 import {
   getIssueCountAsync,
   getIssueListAsync,
+  setError,
   setIsHome,
   setPage,
   setUrlInfo,
@@ -32,7 +33,8 @@ const Nav = () => {
     const { username, reponame, error } = getUrlInfo(url);
 
     if (error) {
-      throw new Error(error);
+      dispatch(setError(error));
+      return;
     }
 
     batch(() => {
