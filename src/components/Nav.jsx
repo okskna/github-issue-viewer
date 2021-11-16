@@ -1,38 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import Logo from './Logo';
 import SearchBox from './SearchBox';
 
-import getIssueCount from '../apis/getIssueCount';
-import getIssueList from '../apis/getIssueList';
 import { flexCenter } from '../common/styles';
 import { getUrlInfo } from '../common/util';
+import { batch, useDispatch } from 'react-redux';
+import {
+  getIssueCountAsync,
+  getIssueListAsync,
+  setIsHome,
+  setPage,
+  setUrlInfo,
+} from '../features/pagination/paginationSlice';
 
 const Nav = () => {
-  const [url, setUrl] = useState('');
-  const [totalCount, setTotalCount] = useState(0);
-  const [issueList, setIssueList] = useState([]);
-  const [page, setPage] = useState(1);
+  const [url, setUrl] = useState('https://www.github.com/facebook/react');
 
-  useEffect(() => {
-    console.log('🔥: ', totalCount, issueList, page);
-  }, [totalCount, issueList, page]);
+  const dispatch = useDispatch();
+
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+
+    dispatch(setIsHome(true));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('submit!', url);
-
     const { username, reponame, error } = getUrlInfo(url);
 
     if (error) {
-      console.log(error);
-      return;
+      throw new Error(error);
     }
 
-    setTotalCount(await getIssueCount(username, reponame));
-    setIssueList(await getIssueList(username, reponame, page));
+    batch(() => {
+      setUrl('');
+      dispatch(setIsHome(false));
+      dispatch(setUrlInfo({ username, reponame }));
+      dispatch(setPage(1));
+      dispatch(getIssueCountAsync({ username, reponame }));
+      dispatch(getIssueListAsync({ username, reponame }));
+    });
   };
 
   const handleChange = (e) => {
@@ -41,7 +51,7 @@ const Nav = () => {
 
   return (
     <Wrapper>
-      <Logo />
+      <Logo handleLogoClick={handleLogoClick} />
       <SearchBox
         value={url}
         handleSubmit={handleSubmit}

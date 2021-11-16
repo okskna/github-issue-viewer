@@ -1,6 +1,10 @@
 import styled from 'styled-components';
+import { flexCenter } from '../common/styles';
 
-const InputButton = styled.button`
+const Button = styled.button`
+  ${flexCenter}
+  align-self: flex-end;
+
   font-size: 1rem;
   border-radius: 3px;
   margin-left: 2px;
@@ -11,13 +15,14 @@ const InputButton = styled.button`
   color: ${({ theme }) => theme.color.deepblack};
   background-color: ${({ theme }) => theme.color.sub};
   border: 2px solid ${({ theme }) => theme.color.sub};
+  cursor: pointer;
 
   &:hover {
     opacity: 0.8;
   }
 `;
 
-InputButton.defaultProps = {
+Button.defaultProps = {
   theme: {
     color: {
       main: '#376935',
@@ -25,4 +30,4 @@ InputButton.defaultProps = {
   },
 };
 
-export default InputButton;
+export default Button;

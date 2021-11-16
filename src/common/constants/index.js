@@ -1,3 +1,4 @@
 export const CONSTANTS = {
-  PER_PAGE: 10,
+  PER_PAGE: 20,
+  PAGINATION_MAX_LENGTH: 9,
 };

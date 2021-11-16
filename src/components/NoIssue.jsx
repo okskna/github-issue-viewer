@@ -1,7 +1,13 @@
 import React from 'react';
+import styled from 'styled-components';
+import { flexCenter } from '../common/styles';
 
 const NoIssue = () => {
-  return <div>No result.</div>;
+  return <Wrapper>No result.</Wrapper>;
 };
+
+const Wrapper = styled.div`
+  ${flexCenter}
+`;
 
 export default NoIssue;

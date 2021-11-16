@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 import Input from './Input';
-import InputButton from './InputButton';
+import Button from './Button';
 
 import { BsSearch } from 'react-icons/bs';
 import { flexCenter } from '../common/styles';
@@ -34,9 +34,9 @@ const SearchBox = ({
             placeholder={placeholder}
           />
         </Label>
-        <InputButton type='submit' width={buttonWidth}>
+        <Button type='submit' width={buttonWidth}>
           <BsSearch />
-        </InputButton>
+        </Button>
       </Form>
     </Wrapper>
   );

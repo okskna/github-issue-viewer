@@ -12,6 +12,7 @@ const GlobalStyle = createGlobalStyle`
     background-color: ${theme.color.deepblack};
     width: 100vw;
     height: 100vh;
+    overflow: hidden;
   }
 
   ul {
@@ -24,7 +25,11 @@ const GlobalStyle = createGlobalStyle`
 
   a {
     text-decoration: none;
-    color: ${theme.color.lightpink}
+    color: ${theme.color.lightpink};
+  }
+
+  a:hover {
+    opacity: 0.8;
   }
 
   * {

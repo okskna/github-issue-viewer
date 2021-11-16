@@ -1,4 +1,6 @@
-const isValidUrl = (url) => {
+import { CONSTANTS } from '../constants';
+
+export const isValidUrl = (url) => {
   if (typeof url !== 'string') {
     return false;
   }
@@ -34,9 +36,55 @@ export const getUrlInfo = (url) => {
 
   const [, username, reponame] = parsedUrl.pathname.split('/');
 
+  if (!username || !reponame) {
+    return {
+      username: null,
+      reponame: null,
+      error: 'URL is not valid.',
+    };
+  }
+
   return {
     username,
     reponame,
     error: null,
   };
+};
+
+export const getPageRangeList = (page, maxPage) => {
+  let minShownPage = page - Math.floor(CONSTANTS.PAGINATION_MAX_LENGTH / 2);
+
+  if (minShownPage < 1) {
+    minShownPage = 1;
+  }
+
+  let maxShownPage = minShownPage + CONSTANTS.PAGINATION_MAX_LENGTH - 1;
+
+  if (maxShownPage > maxPage) {
+    maxShownPage = maxPage;
+  }
+
+  if (
+    maxPage > CONSTANTS.PAGINATION_MAX_LENGTH &&
+    maxShownPage === maxPage &&
+    maxShownPage - minShownPage < CONSTANTS.PAGINATION_MAX_LENGTH
+  ) {
+    minShownPage = maxShownPage - CONSTANTS.PAGINATION_MAX_LENGTH + 1;
+  }
+
+  const pageRangeList = [];
+
+  for (let i = minShownPage; i <= maxShownPage; i++) {
+    pageRangeList.push(i);
+  }
+
+  return pageRangeList;
+};
+
+export const makeReposQueryString = (likedList) => {
+  const likedStringList = likedList.map(
+    ({ username, reponame }) => `repo:${username}/${reponame}`
+  );
+
+  return likedStringList.join('+');
 };
