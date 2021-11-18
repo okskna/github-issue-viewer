@@ -1,6 +1,6 @@
 import { CONSTANTS } from '../../common/constants';
 
-export const getIssueCount = async (username, reponame) => {
+export const getIssueCount = async (username, reponame, page) => {
   const requestOptions = {
     method: 'GET',
     redirect: 'follow',
@@ -8,7 +8,7 @@ export const getIssueCount = async (username, reponame) => {
 
   try {
     const response = await fetch(
-      `https://api.github.com/search/issues?q=repo:${username}/${reponame}%20is:issue`,
+      `https://api.github.com/search/issues?q=repo:${username}/${reponame}%20is:issue&per_page=${CONSTANTS.PER_PAGE}&page=${page}`,
       requestOptions
     );
 
@@ -25,8 +25,12 @@ export const getIssueCount = async (username, reponame) => {
     const raw = await response.text();
     const result = JSON.parse(raw);
     const totalCount = result.total_count;
+    const titleList = result.items.map((item) => ({
+      title: item.title,
+      htmlUrl: item.html_url,
+    }));
 
-    return totalCount;
+    return { totalCount, titleList };
   } catch (error) {
     throw new Error(error.message);
   }
@@ -91,7 +95,6 @@ export const getLikedIssueList = async (repos, page) => {
 
     const raw = await response.text();
     const result = JSON.parse(raw);
-    console.log('result: ', result.items);
     const titleList = result.items.map((item) => ({
       title: item.title,
       htmlUrl: item.html_url,

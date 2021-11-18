@@ -8,7 +8,13 @@ import {
 } from './paginationAPI';
 
 const getLikedListFromLocalStorage = () => {
-  const likedListString = localStorage.getItem('issue-viewer-liked-list');
+  if (!window) {
+    return [];
+  }
+
+  const likedListString = window.localStorage.getItem(
+    'issue-viewer-liked-list'
+  );
 
   try {
     const likedList = JSON.parse(likedListString);
@@ -21,7 +27,14 @@ const getLikedListFromLocalStorage = () => {
 };
 
 const setLikedListToLocalStorage = (likedList) => {
-  localStorage.setItem('issue-viewer-liked-list', JSON.stringify(likedList));
+  if (!window) {
+    return;
+  }
+
+  window.localStorage.setItem(
+    'issue-viewer-liked-list',
+    JSON.stringify(likedList)
+  );
 };
 
 const initialState = {
@@ -34,6 +47,7 @@ const initialState = {
   totalCount: 0,
   issueList: [],
 
+  searchMode: CONSTANTS.LIKED_SEARCH,
   isLoading: false,
   isHome: true,
   error: '',
@@ -44,27 +58,10 @@ const initialState = {
 export const getIssueCountAsync = createAsyncThunk(
   'pagination/getIssueCount',
   async (urlInfo) => {
-    const { username, reponame } = urlInfo;
+    const { username, reponame, page = 1 } = urlInfo;
 
     try {
-      const response = await getIssueCount(username, reponame);
-
-      return response;
-    } catch (e) {
-      throw new Error(e.message);
-    }
-  }
-);
-
-export const getIssueListAsync = createAsyncThunk(
-  'pagination/getIssueList',
-  async (urlInfo, thunkAPI) => {
-    const { username, reponame } = urlInfo;
-    const state = thunkAPI.getState();
-    const { page } = state.pagination;
-
-    try {
-      const response = await getIssueList(username, reponame, page);
+      const response = await getIssueCount(username, reponame, page);
 
       return response;
     } catch (e) {
@@ -109,13 +106,6 @@ export const paginationSlice = createSlice({
 
       state.page = page;
     },
-    setPageNext: (state) => {
-      if (state.page + CONSTANTS.PAGINATION_MAX_LENGTH > state.maxPage) {
-        state.page = state.maxPage;
-        return;
-      }
-      state.page = state.page + CONSTANTS.PAGINATION_MAX_LENGTH;
-    },
     setIsHome: (state, action) => {
       const isHome = action.payload;
       state.isHome = isHome;
@@ -124,11 +114,16 @@ export const paginationSlice = createSlice({
         state.issueList = [];
         state.page = 0;
         state.maxPage = 0;
+        state.urlInfo = {
+          username: '',
+          reponame: '',
+        };
       }
     },
     addLikedLink: (state, action) => {
       if (state.likedList.length >= 4) {
         console.warn('liked list is full.');
+        state.error = 'liked list is full.';
         return;
       }
 
@@ -142,6 +137,7 @@ export const paginationSlice = createSlice({
         ).length
       ) {
         console.warn('duplicated.');
+        state.error = 'duplicated.';
         return;
       }
 
@@ -165,6 +161,9 @@ export const paginationSlice = createSlice({
     clearError: (state) => {
       state.error = '';
     },
+    setSearchMode: (state, action) => {
+      state.searchMode = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -176,24 +175,10 @@ export const paginationSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(getIssueCountAsync.fulfilled, (state, action) => {
-        const totalCount = action.payload;
+        const { totalCount, titleList: issueList } = action.payload;
 
         state.totalCount = totalCount;
         state.maxPage = Math.ceil(totalCount / CONSTANTS.PER_PAGE);
-        state.isLoading = false;
-      });
-
-    builder
-      .addCase(getIssueListAsync.pending, (state, action) => {
-        state.isLoading = true;
-      })
-      .addCase(getIssueListAsync.rejected, (state, action) => {
-        state.error = action.error.message;
-        state.isLoading = false;
-      })
-      .addCase(getIssueListAsync.fulfilled, (state, action) => {
-        const issueList = action.payload;
-
         state.issueList = issueList;
         state.isLoading = false;
       });
@@ -210,7 +195,6 @@ export const paginationSlice = createSlice({
         const { titleList: issueList, totalCount } = action.payload;
 
         state.isHome = false;
-        state.page = 1;
         state.maxPage = Math.ceil(totalCount / CONSTANTS.PER_PAGE);
         state.issueList = issueList;
         state.totalCount = totalCount;
@@ -228,6 +212,7 @@ export const {
   deleteLikedLink,
   setError,
   clearError,
+  setSearchMode,
 } = paginationSlice.actions;
 
 export const selectUrlInfo = (state) => state.pagination.urlInfo;
@@ -239,5 +224,6 @@ export const selectIsLoading = (state) => state.pagination.isLoading;
 export const selectIsHome = (state) => state.pagination.isHome;
 export const selectLikedList = (state) => state.pagination.likedList;
 export const selectError = (state) => state.pagination.error;
+export const selectSearchMode = (state) => state.pagination.searchMode;
 
 export default paginationSlice.reducer;

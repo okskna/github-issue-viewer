@@ -1,30 +1,62 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React from 'react';
+import { batch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import Loader from 'react-loader-spinner';
 
 import {
+  getIssueCountAsync,
+  getLikedIssueListAsync,
   selectIsHome,
   selectIsLoading,
   selectIssueList,
   selectLikedList,
+  selectSearchMode,
+  selectUrlInfo,
+  setPage,
 } from '../features/pagination/paginationSlice';
 
 import IssueList from './IssueList';
 import NoIssue from './NoIssue';
-import { flexCenter } from '../common/styles';
 import LikedList from './LikedList';
+import Pagination from './Pagination';
+import LoadSpinner from './LoadSpinner';
+
+import { flexCenter } from '../common/styles';
+import { CONSTANTS } from '../common/constants';
+import { useDispatch } from 'react-redux';
 
 const Board = () => {
   const issueItems = useSelector(selectIssueList);
   const isLoading = useSelector(selectIsLoading);
   const isHome = useSelector(selectIsHome);
   const likedItems = useSelector(selectLikedList);
+  const mode = useSelector(selectSearchMode);
+  const { username, reponame } = useSelector(selectUrlInfo);
+
+  const dispatch = useDispatch();
+
+  const handleSubmit = (e, page) => {
+    e.preventDefault();
+
+    if (mode === CONSTANTS.LIKED_SEARCH) {
+      batch(() => {
+        dispatch(setPage(page));
+        dispatch(getLikedIssueListAsync({ username, reponame, page }));
+      });
+      return;
+    }
+
+    if (mode === CONSTANTS.NORMAL_SEARCH) {
+      batch(() => {
+        dispatch(setPage(page));
+        dispatch(getIssueCountAsync({ username, reponame, page }));
+      });
+    }
+  };
 
   return (
     <Wrapper>
       {isLoading ? (
-        <Loader type='Puff' color='#00BFFF' height={100} width={100}></Loader>
+        <LoadSpinner />
       ) : isHome ? (
         <LikedList items={likedItems} />
       ) : issueItems.length ? (
@@ -32,16 +64,18 @@ const Board = () => {
       ) : (
         <NoIssue />
       )}
+      {!isHome && <Pagination handleSubmit={handleSubmit} />}
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
   ${flexCenter}
+  flex-direction: column;
 
   width: 75%;
   height: 70vh;
-  min-height: 300px;
+  min-height: 500px;
 
   padding: 10px;
   border: 1px solid ${({ theme }) => theme.color.sub};

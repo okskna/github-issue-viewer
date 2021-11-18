@@ -1,24 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+
 import Anchor from './Anchor';
 
-const Issue = ({ item, index }) => {
+import { selectSearchMode } from '../features/pagination/paginationSlice';
+import { CONSTANTS } from '../common/constants';
+
+const Issue = ({ item }) => {
   const { title, htmlUrl } = item;
+
+  const mode = useSelector(selectSearchMode);
+
+  const reponame = htmlUrl?.split('github.com/')[1].split('/')[1];
+  const isLikedMode = mode === CONSTANTS.LIKED_SEARCH;
 
   return (
     <Anchor href={htmlUrl}>
-      {index}. {title}
+      {isLikedMode ? `${reponame}:  ${title}` : `${title}`}
     </Anchor>
   );
 };
 
-Issue.defaultProps = { index: 1 };
+Issue.defaultProps = {
+  reponame: '',
+};
 Issue.propTypes = {
   items: PropTypes.shape({
     title: PropTypes.string.isRequired,
     htmlUrl: PropTypes.string.isRequired,
   }),
-  index: PropTypes.number,
+  reponame: PropTypes.string,
 };
 
 export default Issue;

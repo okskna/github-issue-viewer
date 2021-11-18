@@ -1,48 +1,50 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
 
 import PageList from './PageList';
+import { MdArrowLeft, MdArrowRight } from 'react-icons/md';
 
 import { flexCenter } from '../common/styles';
 import {
-  getIssueCountAsync,
-  getIssueListAsync,
+  selectMaxPage,
   selectPage,
-  selectUrlInfo,
-  setPage,
-  setPageNext,
 } from '../features/pagination/paginationSlice';
+import { CONSTANTS } from '../common/constants';
 
-const Pagination = () => {
+const Pagination = ({ handleSubmit }) => {
   const page = useSelector(selectPage);
-  const { username, reponame } = useSelector(selectUrlInfo);
-
-  const dispatch = useDispatch();
+  const maxPage = useSelector(selectMaxPage);
 
   const handleClickPage = (e) => {
     e.preventDefault();
 
-    dispatch(setPage(Number(e.target.innerText)));
+    const newPage = Number(e.target.innerText);
+
+    handleSubmit(e, newPage);
   };
 
   const handleClickLeftArrow = (e) => {
     e.preventDefault();
-    dispatch(setPage(1));
+
+    const newPage = 1;
+
+    handleSubmit(e, newPage);
   };
 
   const handleClickRightArrow = (e) => {
     e.preventDefault();
-    dispatch(setPageNext());
-  };
 
-  useEffect(() => {
-    if (username && reponame) {
-      dispatch(getIssueCountAsync({ username, reponame }));
-      dispatch(getIssueListAsync({ username, reponame }));
+    let newPage;
+
+    if (page + CONSTANTS.PAGINATION_MAX_LENGTH > maxPage) {
+      newPage = maxPage;
+    } else {
+      newPage = page + CONSTANTS.PAGINATION_MAX_LENGTH;
     }
-  }, [page]);
+
+    handleSubmit(e, newPage);
+  };
 
   return (
     <Wrapper>

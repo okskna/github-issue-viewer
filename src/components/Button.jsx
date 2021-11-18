@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+
 import { flexCenter } from '../common/styles';
 
 const Button = styled.button`

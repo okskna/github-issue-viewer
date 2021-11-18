@@ -1,21 +1,23 @@
 import React from 'react';
-import LikedName from './LikedName';
-import { AiFillStar } from 'react-icons/ai';
 import styled from 'styled-components';
+import { useDispatch, batch } from 'react-redux';
+
 import Button from './Button';
-import { useDispatch } from 'react-redux';
+import LikedName from './LikedName';
+
+import { AiFillStar } from 'react-icons/ai';
 import {
-  addLikedLink,
   deleteLikedLink,
   getIssueCountAsync,
-  getIssueListAsync,
   getLikedIssueListAsync,
+  setError,
   setIsHome,
   setPage,
+  setSearchMode,
   setUrlInfo,
 } from '../features/pagination/paginationSlice';
 import { flexCenter } from '../common/styles';
-import { batch } from 'react-redux';
+import { CONSTANTS } from '../common/constants';
 
 const LikedList = ({ items }) => {
   const dispatch = useDispatch();
@@ -29,8 +31,7 @@ const LikedList = ({ items }) => {
       dispatch(setIsHome(false));
       dispatch(setUrlInfo({ username, reponame }));
       dispatch(setPage(1));
-      dispatch(getIssueCountAsync({ username, reponame }));
-      dispatch(getIssueListAsync({ username, reponame }));
+      dispatch(getIssueCountAsync({ username, reponame, page: 1 }));
     });
   };
 
@@ -49,7 +50,17 @@ const LikedList = ({ items }) => {
   const handleButtonClick = (e) => {
     e.preventDefault();
 
-    dispatch(getLikedIssueListAsync());
+    if (!items.length) {
+      dispatch(setError('Liked list is empty.'));
+
+      return;
+    }
+
+    batch(() => {
+      dispatch(getLikedIssueListAsync());
+      dispatch(setSearchMode(CONSTANTS.LIKED_SEARCH));
+      dispatch(setPage(1));
+    });
   };
 
   return (

@@ -9,15 +9,16 @@ import { getUrlInfo } from '../common/util';
 import { batch, useDispatch } from 'react-redux';
 import {
   getIssueCountAsync,
-  getIssueListAsync,
   setError,
   setIsHome,
   setPage,
+  setSearchMode,
   setUrlInfo,
 } from '../features/pagination/paginationSlice';
+import { CONSTANTS } from '../common/constants';
 
 const Nav = () => {
-  const [url, setUrl] = useState('https://www.github.com/facebook/react');
+  const [url, setUrl] = useState('https://www.github.com/facebook/react'); // FIXME
 
   const dispatch = useDispatch();
 
@@ -34,6 +35,7 @@ const Nav = () => {
 
     if (error) {
       dispatch(setError(error));
+
       return;
     }
 
@@ -42,8 +44,8 @@ const Nav = () => {
       dispatch(setIsHome(false));
       dispatch(setUrlInfo({ username, reponame }));
       dispatch(setPage(1));
-      dispatch(getIssueCountAsync({ username, reponame }));
-      dispatch(getIssueListAsync({ username, reponame }));
+      dispatch(setSearchMode(CONSTANTS.NORMAL_SEARCH));
+      dispatch(getIssueCountAsync({ username, reponame, page: 1 }));
     });
   };
 
@@ -60,7 +62,7 @@ const Nav = () => {
         handleChange={handleChange}
         width='60%'
         buttonWidth='2rem'
-        placeholder='Input your github repository url'
+        placeholder='Input your github repository url (ex. https://github.com/facebook/react)'
       />
     </Wrapper>
   );

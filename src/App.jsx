@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import Nav from './components/Nav';
 import Board from './components/Board';
-import Pagination from './components/Pagination';
 
 import { flexCenter } from './common/styles';
 import GlobalStyle from './common/styles/globalStyle';
@@ -27,7 +26,6 @@ const App = () => {
       {error && <ErrorBox onClick={handleErrorClick}>{error}</ErrorBox>}
       <Nav />
       <Board />
-      <Pagination />
     </Wrapper>
   );
 };
@@ -42,13 +40,20 @@ const Wrapper = styled.nav`
 const ErrorBox = styled.div`
   ${flexCenter}
   position: absolute;
+
   width: 200px;
   height: auto;
   padding: 10px;
+
   border-radius: 3px;
   z-index: 10;
   color: ${({ theme }) => theme.color.sub};
   background-color: ${({ theme }) => theme.color.lightpink};
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 export default App;

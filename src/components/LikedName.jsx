@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { flexCenter } from '../common/styles';
 
 const LikedName = ({ item, handleOnClick }) => {
   const { username, reponame } = item;
