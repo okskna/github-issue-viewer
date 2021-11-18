@@ -27,17 +27,26 @@ https://user-images.githubusercontent.com/26831729/142419321-dab04d0d-f348-4f2a-
 
 1. 구조 변경
 
-초기 구조: App 컴포넌트 > Pagination 컴포넌트
+초기 구조:
+```html
+<App>
+  <Board />
+  <Pagination />
+</App>
+```
+
 문제점: Pagination 컴포넌트에서 일반 검색과 즐겨찾기 검색 기능에 대한 로직 필요 -> Pagination 컴포넌트에서 알 필요가 없는 로직
-문제 해결: Pagination 컴포넌트를 Board 컴포넌트 내부로 옮긴 후, Pagination을 Board 컴포넌트에서 일반 검색과 즐겨찾기 검색을 구분하는 함수를 생성, Pagination 에 Prop으로 전달
+
+문제 해결: Pagination 컴포넌트를 Board 컴포넌트 내부로 옮긴 후, Board 컴포넌트에서 일반 검색과 즐겨찾기 검색을 구분하는 Handler를 생성 및 Pagination에 Prop으로 전달함으로써 해결할 수 있었습니다.
 
 2. API query
 
 변경 전: issues API -> 특정 repository의 issue들을 가져올 수 있습니다. 하지만 total count에 대한 데이터가 존재하지 않습니다.
+
 변경 후: search API -> 여러 repository의 issue들을 한 번에 가져올 수 있습니다. 또한 total count에 대한 데이터가 존재합니다.
 
 docs를 자세히 살펴봄으로써 search API의 존재를 알 수 있었습니다. issues API를 사용하여 즐겨찾기 기능을 구현했다면 여러번의 fetch를 피할 수 없었을 것입니다.
 
 3. 아쉬운 점
 
-초기 구상 당시 상단에 Search box를 두는 디자인을 고려하였고 Route 없는 SPA로 만들어도 괜찮겠다는 생각을 했습니다. 하지만 Route가 존재하지 않는 경우 검색 모드에 대한 상태의 관리가 필요하게 되었습니다. Route를 사용했다면 필요가 없는 상태라고 생각하였고 만약 다시 이 과제를 하게된다면 Sub routing을 사용할 것입니다.
+초기 구상 당시 상단에 Search box를 두는 디자인을 고려하였고 Route 없는 SPA로 만들어도 좋을 것이라 생각했습니다. 하지만 Route가 존재하지 않는 경우 검색 모드(즐겨찾기 검색 및 일반 검색)에 대한 상태가 필요하게 되었습니다. Route를 사용했다면 검색 모드에 관한 상태 없이 깔끔하게 구현할 수 있었을 것입니다. 다시 이 과제를 하게된다면 Sub routing을 사용할 것입니다.
