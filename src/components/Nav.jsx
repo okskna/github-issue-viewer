@@ -18,7 +18,7 @@ import {
 import { CONSTANTS } from '../common/constants';
 
 const Nav = () => {
-  const [url, setUrl] = useState('https://www.github.com/facebook/react'); // FIXME
+  const [url, setUrl] = useState('');
 
   const dispatch = useDispatch();
 
